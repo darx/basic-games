@@ -1,9 +1,18 @@
 class ColourGame {
-  #_colourInterval;
-  #_currentColour = "";
-  #_currentColourText = "";
+  private colourInterval: any;
+  private currentColour: string;
+  private currentColourText: string;
 
-  constructor(context) {
+  private fragment: HTMLElement;
+  private text: HTMLElement;
+  private score: HTMLElement;
+  private actions: HTMLElement;
+  private progress: HTMLElement;
+
+  constructor(context: HTMLElement) {
+    this.currentColour = "";
+    this.currentColourText = "";
+
     this.fragment = document.createElement("div");
     this.fragment.className = "fragment";
 
@@ -17,23 +26,22 @@ class ColourGame {
     this.actions.className = "actions";
 
     this.progress = document.createElement("progress");
-    this.progress.max = 100;
-    this.progress.value = 0;
+    (<HTMLInputElement>this.progress).max = "100";
+    (<HTMLInputElement>this.progress).value = "0";
 
-    const onAction = (e) => {
-      let number = this.keyCodes.indexOf(e.keyCode);
+    const onAction = (e: { keyCode: Number }) => {
+      let number = this.keyCodes.indexOf(Number(e.keyCode));
 
       if (number === -1) return;
 
       if (this.isCorrect(number)) {
         this.setScore(+this.score.innerText + 10);
         this.ding("sine", 1.5);
-        return this.render();
+        this.render();
+      } else {
+        this.setScore(+this.score.innerText - 10);
+        this.ding("sawtooth", 0.08);
       }
-
-      this.setScore(+this.score.innerText - 10);
-      this.ding("sawtooth", 0.08);
-      this.render();
     };
 
     const choose = document.createDocumentFragment();
@@ -42,11 +50,11 @@ class ColourGame {
       let picker = document.createElement("button");
 
       picker.style.backgroundColor = x;
-      picker.innerText = num;
+      picker.innerText = String(num);
 
-      picker.addEventListener("click", () =>
-        onAction({ keyCode: this.keyCodes[num] })
-      );
+      picker.addEventListener("click", () => {
+        onAction({ keyCode: Number(this.keyCodes[num]) });
+      });
 
       choose.appendChild(picker);
     });
@@ -65,7 +73,9 @@ class ColourGame {
     context.appendChild(this.actions);
 
     setInterval(() => {
-      this.progress.value = +this.progress.value + 1;
+      (<HTMLInputElement>this.progress).value = String(
+        +(<HTMLInputElement>this.progress).value + 1
+      );
     }, 40);
   }
 
@@ -79,42 +89,39 @@ class ColourGame {
 
   get randomColour() {
     let colours = this.colours.filter(
-      (x) => x != this.#_currentColour && x != this.#_currentColourText
+      (x) => x != this.currentColour && x != this.currentColourText
     );
     return colours[Math.floor(Math.random() * colours.length)];
   }
 
-  setScore(num) {
-    this.score.innerText = num;
+  setScore(num: Number) {
+    this.score.innerText = String(num);
   }
 
   render() {
-    clearInterval(this.#_colourInterval);
+    clearInterval(this.colourInterval);
 
     let color = this.randomColour;
 
     this.fragment.style.backgroundColor = color;
-    this.#_currentColour = color;
+    this.currentColour = color;
 
     let text = this.randomColour;
 
     this.text.innerText = text;
-    this.#_currentColourText = text;
+    this.currentColourText = text;
     this.fragment.style.color = this.randomColour;
 
-    this.progress.value = 0;
+    (<HTMLInputElement>this.progress).value = String(0);
 
-    this.#_colourInterval = setInterval(() => {
-      this.setScore(+this.score.innerText - 10);
-      this.render();
-    }, 4000);
+    this.colourInterval = setInterval(() => this.render(), 4000);
   }
 
-  isCorrect(num) {
-    return this.colours[num - 1] == this.#_currentColourText;
+  isCorrect(num: Number) {
+    return this.colours[+num - 1] == this.currentColourText;
   }
 
-  ding(type, speed) {
+  ding(type: OscillatorType, speed: Number) {
     const context = new AudioContext();
     const oscillator = context.createOscillator();
     const gain = context.createGain();
@@ -127,7 +134,7 @@ class ColourGame {
     gain.connect(context.destination);
     gain.gain.exponentialRampToValueAtTime(
       0.00001,
-      context.currentTime + speed
+      context.currentTime + +speed
     );
   }
 }
