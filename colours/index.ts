@@ -1,5 +1,3 @@
-import "./style.css";
-
 class ColourGame {
   private colourInterval: any;
   private currentColour: string;
