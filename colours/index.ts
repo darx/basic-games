@@ -37,11 +37,12 @@ class ColourGame {
       if (this.isCorrect(number)) {
         this.setScore(+this.score.innerText + 10);
         this.ding("sine", 1.5);
-        this.render();
-      } else {
-        this.setScore(+this.score.innerText - 10);
-        this.ding("sawtooth", 0.08);
+        return this.render();
       }
+      
+      this.setScore(+this.score.innerText - 10);
+      this.ding("sawtooth", 0.08);
+      this.render();
     };
 
     const choose = document.createDocumentFragment();
