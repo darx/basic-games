@@ -3,6 +3,7 @@ class ColourGame {
   private currentColour: string;
   private currentColourText: string;
 
+  private context: HTMLElement;
   private fragment: HTMLElement;
   private text: HTMLElement;
   private score: HTMLElement;
@@ -10,6 +11,8 @@ class ColourGame {
   private progress: HTMLElement;
 
   constructor(context: HTMLElement) {
+    this.context = context;
+
     this.currentColour = "";
     this.currentColourText = "";
 
@@ -21,6 +24,7 @@ class ColourGame {
 
     this.score = document.createElement("span");
     this.score.className = "score";
+    this.score.innerText = "0";
 
     this.actions = document.createElement("div");
     this.actions.className = "actions";
@@ -62,10 +66,10 @@ class ColourGame {
 
     this.render();
 
+    this.fragment.appendChild(this.score);
     this.fragment.appendChild(this.progress);
     this.fragment.appendChild(this.text);
 
-    context.appendChild(this.score);
     context.appendChild(this.fragment);
     context.appendChild(this.actions);
 
@@ -114,12 +118,14 @@ class ColourGame {
 
     this.fragment.style.backgroundColor = color;
     this.currentColour = color;
+    this.context.style.setProperty('--fragment-colour', color);
 
     let text = this.randomColour;
 
     this.text.innerText = text;
     this.currentColourText = text;
     this.fragment.style.color = this.randomColour;
+    this.context.style.setProperty('--font-colour', this.fragment.style.color);
 
     (<HTMLInputElement>this.progress).value = String(0);
 
@@ -147,5 +153,3 @@ class ColourGame {
     );
   }
 }
-
-new ColourGame(<HTMLElement>document.getElementById("app"));
