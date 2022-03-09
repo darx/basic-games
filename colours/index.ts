@@ -1,3 +1,5 @@
+import "./style.css";
+
 class ColourGame {
   private colourInterval: any;
   private currentColour: string;
@@ -35,14 +37,10 @@ class ColourGame {
       if (number === -1) return;
 
       if (this.isCorrect(number)) {
-        this.setScore(+this.score.innerText + 10);
-        this.ding("sine", 1.5);
-        return this.render();
+        return this.increment();
       }
-      
-      this.setScore(+this.score.innerText - 10);
-      this.ding("sawtooth", 0.08);
-      this.render();
+
+      this.decrement();
     };
 
     const choose = document.createDocumentFragment();
@@ -99,6 +97,18 @@ class ColourGame {
     this.score.innerText = String(num);
   }
 
+  private increment() {
+    this.setScore(+this.score.innerText + 10);
+    this.ding("sine", 1.5);
+    this.render();
+  }
+
+  private decrement() {
+    this.setScore(+this.score.innerText - 10);
+    this.ding("sawtooth", 0.08);
+    this.render();
+  }
+
   render() {
     clearInterval(this.colourInterval);
 
@@ -115,7 +125,7 @@ class ColourGame {
 
     (<HTMLInputElement>this.progress).value = String(0);
 
-    this.colourInterval = setInterval(() => this.render(), 4000);
+    this.colourInterval = setInterval(() => this.decrement(), 4000);
   }
 
   isCorrect(num: Number) {
@@ -139,3 +149,5 @@ class ColourGame {
     );
   }
 }
+
+new ColourGame(<HTMLElement>document.getElementById("app"));
